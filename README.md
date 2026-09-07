@@ -71,3 +71,71 @@ Run the optimization script:
 ```bash
 python train_pinn.py
 ```
+
+NOTE 
+
+This project is fully optimized to run natively in **Kaggle Notebook environments** with GPU acceleration, as well as locally inside **Docker** containers.
+
+---
+
+## 🚀 Interactive Workspace & Quick Start
+
+### ⚡ Run Directly on Kaggle
+You can launch, train, and modify this complete architecture without any local setup using Kaggle's free GPU compute infrastructure:
+* **[[Link to Kaggle Notebook Workspace](https://www.kaggle.com/code/marymwanzi/momentum128-readandinfer-ec8590)]** 
+* Mount Dataset Input: `blastnet-momentum128-3d-sr-dataset`
+* Expected Output: Visual wake slice plots and an exported `VehicleFluidPINN.onnx` file ready for Unity deployment.
+
+### 🐳 Local Containerized Execution (Docker)
+To run the training routine locally on your own machine or cloud compute cluster with identical environments, use the included Docker configuration:
+
+```bash
+# Build the CUDA-accelerated image
+docker build -t 3d-pinn-fluid-engine .
+
+# Run the container with GPU access (mount your local dataset directory)
+docker run --gpus all \
+  -v /path/to/your/local/dataset:/input/blastnet-momentum128-3d-sr-dataset \
+  3d-pinn-fluid-engine
+```
+
+---
+
+## 🔬 Physics-Informed Loss Layer & Flow Pipeline
+
+```mermaid
+graph TD
+    classDef input fill:#2b3440,stroke:#3f4957,stroke-width:2px,color:#fff;
+    classDef model fill:#1f6feb,stroke:#104eb0,stroke-width:2px,color:#fff;
+    classDef loss fill:#d29922,stroke:#b17e10,stroke-width:2px,color:#fff;
+    classDef optim fill:#238636,stroke:#1a6528,stroke-width:2px,color:#fff;
+
+    IN[5-Channel Input 3D <br><b>U, V, W, Smoke, Vehicle Mask</b>]:::input
+    CONV[3D Convolutional Feature Layers <br><i>Latent Field Map Extraction</i>]:::model
+    OUT[4-Channel Output 3D <br><b>Predicted U, V, W, Smoke at t+1</b>]:::model
+    
+    MSE[Data-Driven Objectives <br><i>Temporal MSE Loss</i>]:::loss
+    PINN[Physics-Informed Loss <br><i>Residual Evaluator: Mass Conservation & Transport</i>]:::loss
+    
+    UNI[Unified Loss Optimization <br><b>Total Loss = Data + λ₁ Div + λ₂ Transport</b>]:::optim
+    CLIP[Gradient Clip Block <br><i>max_norm = 1.0 Circuit Breaker</i>]:::optim
+
+    IN --> CONV
+    CONV --> OUT
+    OUT -->|Validation Slices| MSE
+    OUT -->|Central Differences| PINN
+    MSE --> UNI
+    PINN --> UNI
+    UNI --> CLIP
+    CLIP -->|Backpropagation Pass| CONV
+```
+
+### ⚡ Optimization & Boundary Stabilization Safeguards
+When deep neural networks encounter absolute vertical boundaries ($0.0 \rightarrow 1.0$ voxel masks), calculated gradient values approach infinity, causing immediate gradient explosions. This architecture bypasses this failure mode using:
+* **Gaussian Boundary Regularization:** Applies an inline Gaussian filter ($\sigma = 1.2$) to the vehicle mask grid. Softening sharp edges provides continuous, differentiable spaces for the central difference calculations.
+* **Inline Norm Circuit Breaker:** Leverages a strict gradient clipping ceiling (`max_norm=1.0`) directly preceding optimization adjustments to prevent network weights from tearing apart near transient pockets of high velocity.
+
+---
+
+## 🎮 Game Engine Integration (Unity Deploy)
+The final cell of the training cycle automatically traces the runtime computational graph and outputs a universal `VehicleFluidPINN.onnx` asset. This model is ready to be imported into **Unity Sentis** for real-time volumetric rendering and interactive fluid-vehicle collisions inside game worlds.
