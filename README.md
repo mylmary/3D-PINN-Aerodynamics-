@@ -10,8 +10,9 @@ A PyTorch implementation of a 3D Physics-Informed Neural Network (PINN) designed
 
 Traditional deep learning models treat fluid mechanics as pure image-to-image translations, causing non-physical mass loss and gradient explosions near sharp structural boundaries. This architecture addresses those constraints through an end-to-end 3D Convolutional Network embedded with an inline **Hybrid Physics Loss Layer**.
 
++----------------------+|  5-Channel Input 3D  | --> [U, V, W, Smoke, Vehicle Mask]+----------------------+|v+----------------------+|   3D Convolutional   | --> Latent Field Map Extraction|    Feature Layers    |+----------------------+|v+----------------------+|  4-Channel Output 3D | --> Predicted [U, V, W, Smoke] at t+1+----------------------+|+---------------------+---------------------+|                                           |v                                           v+-------------------------+                 +-------------------------+|  Data-Driven Objectives |                 |  Physics-Informed Loss  ||     (Temporal MSE)      |                 |   (Residual Evaluator)  |+-------------------------+                 +-------------------------+|                                           |+---------------------+---------------------+|v+--------------------------+| Unified Loss Optimization| --> Gradient Clipped @ 1.0+--------------------------+
 
-
+---
 
 ## Physics-Informed Formulation
 
