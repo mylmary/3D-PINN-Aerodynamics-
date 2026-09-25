@@ -13,18 +13,16 @@ Traditional deep learning models treat fluid mechanics as pure image-to-image tr
 <img width="1073" height="1144" alt="image" src="https://github.com/user-attachments/assets/fb35dd6d-ad51-45f8-96c7-373cf2643601" />
 
 
-## Physics-Informed Formulation
-
-The network trains by optimizing a unified objective function across structural data parameters and partial differential equations governing transport and mass continuity:
+## Physics-Informed Loss Function
 
 $$
-\mathcal{L}_{\text{total}}
+\mathcal{L}_{\mathrm{total}}
 =
-\mathcal{L}_{\text{data}}
+\mathcal{L}_{\mathrm{data}}
 +
-\lambda_1 \mathcal{L}_{\text{divergence}}
+\lambda_1 \mathcal{L}_{\mathrm{divergence}}
 +
-\lambda_2 \mathcal{L}_{\text{transport}}
+\lambda_2 \mathcal{L}_{\mathrm{transport}}
 $$
 
 ### 1. Incompressibility Constraint (Mass Conservation)
@@ -32,7 +30,7 @@ $$
 To enforce physical mass conservation, the fluid velocities are driven toward a zero-divergence field via spatial central differences:
 
 $$
-\mathcal{L}_{\text{divergence}}
+\mathcal{L}_{\mathrm{divergence}}
 =
 \frac{1}{N}
 \sum_{i=1}^{N}
@@ -50,7 +48,7 @@ $$
 The dynamic propagation of smoke density $\phi$ is constrained by the physical advection-diffusion equation using the predicted velocity field:
 
 $$
-\mathcal{L}_{\text{transport}}
+\mathcal{L}_{\mathrm{transport}}
 =
 \frac{1}{N}
 \sum_{i=1}^{N}
