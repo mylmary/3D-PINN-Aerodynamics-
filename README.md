@@ -13,57 +13,8 @@ Traditional deep learning models treat fluid mechanics as pure image-to-image tr
 <img width="1073" height="1144" alt="image" src="https://github.com/user-attachments/assets/fb35dd6d-ad51-45f8-96c7-373cf2643601" />
 
 
-## Physics-Informed Loss Function
+<img width="1100" height="700" alt="image" src="https://github.com/user-attachments/assets/54d83b59-c5f7-428c-a4cc-061907b94be3" />
 
-$$
-\mathcal{L}_{\mathrm{total}}
-=
-\mathcal{L}_{\mathrm{data}}
-+
-\lambda_1 \mathcal{L}_{\mathrm{divergence}}
-+
-\lambda_2 \mathcal{L}_{\mathrm{transport}}
-$$
-
-### 1. Incompressibility Constraint (Mass Conservation)
-
-To enforce physical mass conservation, the fluid velocities are driven toward a zero-divergence field via spatial central differences:
-
-$$
-\mathcal{L}_{\mathrm{divergence}}
-=
-\frac{1}{N}
-\sum_{i=1}^{N}
-\left(
-\frac{\partial u_i}{\partial x}
-+
-\frac{\partial v_i}{\partial y}
-+
-\frac{\partial w_i}{\partial z}
-\right)^2
-$$
-
-### 2. Scalar Advection-Diffusion Transport
-
-The dynamic propagation of smoke density $\phi$ is constrained by the physical advection-diffusion equation using the predicted velocity field:
-
-$$
-\mathcal{L}_{\mathrm{transport}}
-=
-\frac{1}{N}
-\sum_{i=1}^{N}
-\left(
-u_i\frac{\partial \phi_i}{\partial x}
-+
-v_i\frac{\partial \phi_i}{\partial y}
-+
-w_i\frac{\partial \phi_i}{\partial z}
--
-D\nabla^2\phi_i
-\right)^2
-$$
-
-where $D$ represents the specified isotropic diffusion coefficient.
 
 ---
 
