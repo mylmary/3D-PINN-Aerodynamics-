@@ -10,27 +10,62 @@ A PyTorch implementation of a 3D Physics-Informed Neural Network (PINN) designed
 
 Traditional deep learning models treat fluid mechanics as pure image-to-image translations, causing non-physical mass loss and gradient explosions near sharp structural boundaries. This architecture addresses those constraints through an end-to-end 3D Convolutional Network embedded with an inline **Hybrid Physics Loss Layer**.
 
-+----------------------+|  5-Channel Input 3D  | --> [U, V, W, Smoke, Vehicle Mask]+----------------------+|v+----------------------+|   3D Convolutional   | --> Latent Field Map Extraction|    Feature Layers    |+----------------------+|v+----------------------+|  4-Channel Output 3D | --> Predicted [U, V, W, Smoke] at t+1+----------------------+|+---------------------+---------------------+|                                           |v                                           v+-------------------------+                 +-------------------------+|  Data-Driven Objectives |                 |  Physics-Informed Loss  ||     (Temporal MSE)      |                 |   (Residual Evaluator)  |+-------------------------+                 +-------------------------+|                                           |+---------------------+---------------------+|v+--------------------------+| Unified Loss Optimization| --> Gradient Clipped @ 1.0+--------------------------+
+<img width="1073" height="1144" alt="image" src="https://github.com/user-attachments/assets/fb35dd6d-ad51-45f8-96c7-373cf2643601" />
 
----
 
 ## Physics-Informed Formulation
 
 The network trains by optimizing a unified objective function across structural data parameters and partial differential equations governing transport and mass continuity:
 
-\[\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{data}} + \lambda_1 \mathcal{L}_{\text{divergence}} + \lambda_2 \mathcal{L}_{\text{transport}}\]
+$$
+\mathcal{L}_{\text{total}}
+=
+\mathcal{L}_{\text{data}}
++
+\lambda_1 \mathcal{L}_{\text{divergence}}
++
+\lambda_2 \mathcal{L}_{\text{transport}}
+$$
 
 ### 1. Incompressibility Constraint (Mass Conservation)
+
 To enforce physical mass conservation, the fluid velocities are driven toward a zero-divergence field via spatial central differences:
 
-\[\mathcal{L}_{\text{divergence}} = \frac{1}{N}\sum \left( \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} + \frac{\partial w}{\partial z} \right)^2\]
+$$
+\mathcal{L}_{\text{divergence}}
+=
+\frac{1}{N}
+\sum_{i=1}^{N}
+\left(
+\frac{\partial u_i}{\partial x}
++
+\frac{\partial v_i}{\partial y}
++
+\frac{\partial w_i}{\partial z}
+\right)^2
+$$
 
 ### 2. Scalar Advection-Diffusion Transport
-The dynamic propagation of smoke density \(\phi\) is bound to physical advection and diffusion equations using calculated velocity parameters:
 
-\[\mathcal{L}_{\text{transport}} = \frac{1}{N}\sum \left( \left[ u\frac{\partial \phi}{\partial x} + v\frac{\partial \phi}{\partial y} + w\frac{\partial \phi}{\partial z} \right] - D\nabla^2 \phi \right)^2\]
+The dynamic propagation of smoke density $\phi$ is constrained by the physical advection-diffusion equation using the predicted velocity field:
 
-Where \(D\) represents the specified isotropic diffusion coefficient.
+$$
+\mathcal{L}_{\text{transport}}
+=
+\frac{1}{N}
+\sum_{i=1}^{N}
+\left(
+u_i\frac{\partial \phi_i}{\partial x}
++
+v_i\frac{\partial \phi_i}{\partial y}
++
+w_i\frac{\partial \phi_i}{\partial z}
+-
+D\nabla^2\phi_i
+\right)^2
+$$
+
+where $D$ represents the specified isotropic diffusion coefficient.
 
 ---
 
