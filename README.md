@@ -62,7 +62,7 @@ This project is fully optimized to run natively in **Kaggle Notebook environment
 
 ---
 
-## 🚀 Interactive Workspace & Quick Start
+##  Interactive Workspace & Quick Start
 
 ### ⚡ Run Directly on Kaggle
 You can launch, train, and modify this complete architecture without any local setup using Kaggle's free GPU compute infrastructure:
@@ -70,7 +70,7 @@ You can launch, train, and modify this complete architecture without any local s
 * Mount Dataset Input: `blastnet-momentum128-3d-sr-dataset`
 * Expected Output: Visual wake slice plots and an exported `VehicleFluidPINN.onnx` file ready for Unity deployment.
 
-### 🐳 Local Containerized Execution (Docker)
+###  Local Containerized Execution (Docker)
 To run the training routine locally on your own machine or cloud compute cluster with identical environments, use the included Docker configuration:
 
 ```bash
@@ -85,7 +85,7 @@ docker run --gpus all \
 
 ---
 
-## 🔬 Physics-Informed Loss Layer & Flow Pipeline
+##  Physics-Informed Loss Layer & Flow Pipeline
 
 ```mermaid
 graph TD
@@ -114,12 +114,12 @@ graph TD
     CLIP -->|Backpropagation Pass| CONV
 ```
 
-### ⚡ Optimization & Boundary Stabilization Safeguards
+###  Optimization & Boundary Stabilization Safeguards
 When deep neural networks encounter absolute vertical boundaries ($0.0 \rightarrow 1.0$ voxel masks), calculated gradient values approach infinity, causing immediate gradient explosions. This architecture bypasses this failure mode using:
 * **Gaussian Boundary Regularization:** Applies an inline Gaussian filter ($\sigma = 1.2$) to the vehicle mask grid. Softening sharp edges provides continuous, differentiable spaces for the central difference calculations.
 * **Inline Norm Circuit Breaker:** Leverages a strict gradient clipping ceiling (`max_norm=1.0`) directly preceding optimization adjustments to prevent network weights from tearing apart near transient pockets of high velocity.
 
 ---
 
-## 🎮 Game Engine Integration (Unity Deploy)
+##  Game Engine Integration (Unity Deploy)
 The final cell of the training cycle automatically traces the runtime computational graph and outputs a universal `VehicleFluidPINN.onnx` asset. This model is ready to be imported into **Unity Sentis** for real-time volumetric rendering and interactive fluid-vehicle collisions inside game worlds.
